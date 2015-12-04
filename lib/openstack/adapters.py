@@ -1,3 +1,6 @@
+"""Adapter classes and utilities for use with Reactive interfaces"""
+
+
 class OpenStackRelationAdapter(object):
     """
     Base adapter class for all OpenStack related adapters.
@@ -89,13 +92,22 @@ class OpenStackRelationAdapters(object):
     By default, relations will be wrapped in an OpenStackRelationAdapter.
     """
 
+    _adapters = {
+        'amqp': RabbitMQRelationAdapter,
+    }
+    """
+    Default adapter mappings; may be overridden by relation adapters
+    in subclasses.
+    """
+
     def __init__(self, relations):
+        self._adapters.update(self.relation_adapters)
         self._relations = []
         for relation in relations:
             relation_name = relation.relation_name
-            if relation_name in self.relation_adapters:
+            if relation_name in self.adapters:
                 self.__dict__[relation_name] = (
-                    self.relation_adapters[relation_name](relation)
+                    self._adapters[relation_name](relation)
                 )
             else:
                 self.__dict__[relation_name] = (
