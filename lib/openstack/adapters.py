@@ -69,7 +69,7 @@ class RabbitMQRelationAdapter(OpenStackRelationAdapter):
         return self.relation.username()
 
 
-class OpenStackInterfaceAdapters(object):
+class OpenStackRelationAdapters(object):
     """
     Base adapters class for OpenStack Charms, used to aggregate
     the relations associated with a particular charm so that their
@@ -78,28 +78,28 @@ class OpenStackInterfaceAdapters(object):
         adapters.amqp.private_address
     """
 
-    interface_adapters = {}
+    relation_adapters = {}
     """
     Dictionary mapping relation names to adapter classes, e.g:
 
-        interface_adapters = {
+        relation_adapters = {
             'amqp': RabbitMQRelationAdapter,
         }
 
-    By default, interfaces will be wrapped in an OpenStackRelationAdapter.
+    By default, relations will be wrapped in an OpenStackRelationAdapter.
     """
 
-    def __init__(self, interfaces):
+    def __init__(self, relations):
         self._relations = []
-        for interface in interfaces:
-            relation_name = interface.relation_name
-            if relation_name in self.interface_adapters:
+        for relation in relations:
+            relation_name = relation.relation_name
+            if relation_name in self.relation_adapters:
                 self.__dict__[relation_name] = (
-                    self.interface_adapters[relation_name](interface)
+                    self.relation_adapters[relation_name](relation)
                 )
             else:
                 self.__dict__[relation_name] = (
-                    OpenStackRelationAdapter(interface)
+                    OpenStackRelationAdapter(relation)
                 )
             self._relations.append(relation_name)
 
