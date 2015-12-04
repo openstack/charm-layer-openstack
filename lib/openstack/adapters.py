@@ -83,6 +83,7 @@ class OpenStackInterfaceAdapters(object):
     """
 
     def __init__(self, interfaces):
+        self._relations = []
         for interface in interfaces:
             relation_name = interface.relation_name
             if relation_name in self.interface_adapters:
@@ -93,3 +94,11 @@ class OpenStackInterfaceAdapters(object):
                 self.__dict__[relation_name] = (
                     OpenStackRelationAdapter(interface)
                 )
+            self._relations.append(relation_name)
+
+    def __iter__(self):
+        """
+        Iterate over the relations presented to the charm.
+        """
+        for relation in self._relations:
+            yield relation, self.__dict__[relation]
