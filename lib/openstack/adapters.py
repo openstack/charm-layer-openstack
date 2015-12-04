@@ -31,7 +31,6 @@ class OpenStackRelationAdapter(object):
             self.__dict__[meth_name] = getattr(self.relation,
                                                meth_name)()
 
-
 class RabbitMQRelationAdapter(OpenStackRelationAdapter):
     """
     Adapter for the RabbitMQRequires relation interface.
@@ -60,6 +59,14 @@ class RabbitMQRelationAdapter(OpenStackRelationAdapter):
             return ','.join(hosts)
         else:
             return None
+
+    @property
+    def vhost(self):
+        return self.relation.vhost()
+
+    @property
+    def username(self):
+        return self.relation.username()
 
 
 class OpenStackInterfaceAdapters(object):
