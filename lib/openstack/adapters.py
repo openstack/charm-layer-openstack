@@ -105,7 +105,7 @@ class OpenStackRelationAdapters(object):
         self._relations = []
         for relation in relations:
             relation_name = relation.relation_name
-            if relation_name in self.adapters:
+            if relation_name in self._adapters:
                 self.__dict__[relation_name] = (
                     self._adapters[relation_name](relation)
                 )
