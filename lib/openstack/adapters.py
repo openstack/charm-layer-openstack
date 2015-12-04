@@ -93,13 +93,3 @@ class OpenStackInterfaceAdapters(object):
                 self.__dict__[relation_name] = (
                     OpenStackRelationAdapter(interface)
                 )
-
-
-class TestCharmAdapters(OpenStackInterfaceAdapters):
-    """
-    Adapters class for the TestCharm charm.
-    """
-
-    interface_adapters = {
-        'amqp': RabbitMQRelationAdapter,
- }
