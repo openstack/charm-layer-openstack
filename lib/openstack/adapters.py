@@ -1,5 +1,7 @@
 """Adapter classes and utilities for use with Reactive interfaces"""
 
+from charmhelpers.core import hookenv
+
 
 class OpenStackRelationAdapter(object):
     """
@@ -72,6 +74,18 @@ class RabbitMQRelationAdapter(OpenStackRelationAdapter):
     def username(self):
         return self.relation.username()
 
+class ConfigurationAdapter(object):
+    """
+    Configuration Adapter which provides python based access
+    to all configuration options for the current charm.
+    """
+
+    def __init__(self):
+        _config = hookenv.config()
+        for k, v in _config.items():
+            k = k.replace('-', '_')
+            self.__dict__[k] = v
+
 
 class OpenStackRelationAdapters(object):
     """
@@ -101,7 +115,7 @@ class OpenStackRelationAdapters(object):
     in subclasses.
     """
 
-    def __init__(self, relations):
+    def __init__(self, relations, options=ConfigurationAdapter):
         self._adapters.update(self.relation_adapters)
         self._relations = []
         for relation in relations:
@@ -115,6 +129,8 @@ class OpenStackRelationAdapters(object):
                     OpenStackRelationAdapter(relation)
                 )
             self._relations.append(relation_name)
+        self.__dict__['options'] = options()
+        self._relations.append('options')
 
     def __iter__(self):
         """
