@@ -15,6 +15,7 @@ _address_map = {
         'config': 'os-admin-network',
         'fallback': 'private-address'
     }
+}
 
 def canonical_url(configs, endpoint_type=PUBLIC):
     '''
