@@ -30,6 +30,8 @@ _address_map = {
         'fallback': 'private-address'
     }
 }
+
+
 def canonical_url(configs, endpoint_type=PUBLIC):
     '''
     Returns the correct HTTP URL to this host given the state of HTTPS
@@ -75,4 +77,3 @@ def resolve_address(endpoint_type=PUBLIC):
                          ' based on charm state and configuration')
     else:
         return resolved_address
-

@@ -51,7 +51,7 @@ class RabbitMQRelationAdapter(OpenStackRelationAdapter):
 
     def __init__(self, relation):
         add_accessors = ['vhost', 'username']
-        super(RabbitMQRelationAdapter,self).__init__(relation, add_accessors)
+        super(RabbitMQRelationAdapter, self).__init__(relation, add_accessors)
 
     @property
     def host(self):
@@ -85,7 +85,7 @@ class DatabaseRelationAdapter(OpenStackRelationAdapter):
 
     def __init__(self, relation):
         add_accessors = ['password', 'username', 'database']
-        super(DatabaseRelationAdapter,self).__init__(relation, add_accessors)
+        super(DatabaseRelationAdapter, self).__init__(relation, add_accessors)
 
     @property
     def host(self):
