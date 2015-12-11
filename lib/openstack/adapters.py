@@ -13,8 +13,12 @@ class OpenStackRelationAdapter(object):
     The generic type of the interface the adapter is wrapping.
     """
 
-    def __init__(self, relation):
+    def __init__(self, relation, accessors=None):
         self.relation = relation
+        if accessors:
+            self.accessors = accessors
+        else:
+            self.accessors = []
         self._setup_properties()
 
     @property
@@ -29,7 +33,8 @@ class OpenStackRelationAdapter(object):
         Setup property based accessors for an interfaces
         auto accessors
         """
-        for field in self.relation.auto_accessors:
+        self.accessors.extend(self.relation.auto_accessors)
+        for field in self.accessors:
             meth_name = field.replace('-', '_')
             # TODO: see if we can make this dynamic, rather
             #       than making all calls on setup.
@@ -43,6 +48,10 @@ class RabbitMQRelationAdapter(OpenStackRelationAdapter):
     """
 
     interface_type = "messaging"
+
+    def __init__(self, relation):
+        add_accessors = ['vhost', 'username']
+        super(RabbitMQRelationAdapter,self).__init__(relation, add_accessors)
 
     @property
     def host(self):
@@ -66,13 +75,29 @@ class RabbitMQRelationAdapter(OpenStackRelationAdapter):
         else:
             return None
 
-    @property
-    def vhost(self):
-        return self.relation.vhost()
+
+class DatabaseRelationAdapter(OpenStackRelationAdapter):
+    """
+    Adapter for the RabbitMQRequires relation interface.
+    """
+
+    interface_type = "database"
+
+    def __init__(self, relation):
+        add_accessors = ['password', 'username', 'database']
+        super(DatabaseRelationAdapter,self).__init__(relation, add_accessors)
 
     @property
-    def username(self):
-        return self.relation.username()
+    def host(self):
+        """
+        Hostname that should be used to access RabbitMQ.
+        """
+        return self.relation.db_host()
+
+    @property
+    def type(self):
+        return 'mysql'
+
 
 class ConfigurationAdapter(object):
     """
@@ -109,6 +134,7 @@ class OpenStackRelationAdapters(object):
 
     _adapters = {
         'amqp': RabbitMQRelationAdapter,
+        'shared_db': DatabaseRelationAdapter,
     }
     """
     Default adapter mappings; may be overridden by relation adapters
@@ -119,7 +145,7 @@ class OpenStackRelationAdapters(object):
         self._adapters.update(self.relation_adapters)
         self._relations = []
         for relation in relations:
-            relation_name = relation.relation_name
+            relation_name = relation.relation_name.replace('-', '_')
             if relation_name in self._adapters:
                 self.__dict__[relation_name] = (
                     self._adapters[relation_name](relation)
