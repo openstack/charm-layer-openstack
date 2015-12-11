@@ -32,13 +32,11 @@ _address_map = {
 }
 
 
-def canonical_url(configs, endpoint_type=PUBLIC):
+def canonical_url(endpoint_type=PUBLIC):
     '''
     Returns the correct HTTP URL to this host given the state of HTTPS
     configuration, hacluster and charm configuration.
 
-    :configs OSTemplateRenderer: A config tempating object to inspect for
-        a complete https context.
     :endpoint_type str: The endpoint type to resolve.
 
     :returns str: Base URL for services on the current service unit.
