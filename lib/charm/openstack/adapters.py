@@ -98,6 +98,24 @@ class DatabaseRelationAdapter(OpenStackRelationAdapter):
     def type(self):
         return 'mysql'
 
+    @property
+    def uri(self):
+        uri = 'mysql://{}:{}@{}/{}'.format(
+            self.username,
+            self.password,
+            self.host,
+            self.database,
+        )
+        if self.ssl_ca:
+            uri = '{}?ssl_ca={}'.format(uri, self.ssl_ca)
+            if self.ssl_cert:
+                uri = '{}&ssl_cert={}&ssl_key={}'.format(uri, self.ssl_cert,
+                                                         self.ssl_key)
+        return uri
+
+
+
+
 
 class ConfigurationAdapter(object):
     """
