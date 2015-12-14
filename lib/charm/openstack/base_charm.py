@@ -1,5 +1,13 @@
+from charmhelpers.contrib.openstack.utils import (
+    configure_installation_source,
+)
 from charm.openstack.ip import PUBLIC, INTERNAL, ADMIN, canonical_url
-from charmhelpers.core.hookenv import config
+from charmhelpers.core.hookenv import config, status_set
+from charmhelpers.fetch import (
+    apt_install,
+    apt_update,
+    filter_installed_packages,
+)
 
 class OpenStackCharm(object):
 
