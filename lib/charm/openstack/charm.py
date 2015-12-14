@@ -1,7 +1,8 @@
+"""Classes to support writing re-usable charms in the reactive framework"""
+
 from charmhelpers.contrib.openstack.utils import (
     configure_installation_source,
 )
-from charm.openstack.ip import PUBLIC, INTERNAL, ADMIN, canonical_url
 from charmhelpers.core.hookenv import config, status_set
 from charmhelpers.fetch import (
     apt_install,
@@ -9,7 +10,14 @@ from charmhelpers.fetch import (
     filter_installed_packages,
 )
 
+from charm.openstack.ip import PUBLIC, INTERNAL, ADMIN, canonical_url
+
+
 class OpenStackCharm(object):
+    """
+    Base class for all OpenStack Charm classes;
+    encapulates general OpenStack charm payload operations
+    """
 
     packages = []
     """Packages to install"""
@@ -61,18 +69,21 @@ class OpenStackCharm(object):
         return "{}:{}".format(canonical_url(PUBLIC),
                               self.api_port(self.default_service,
                                             PUBLIC))
+
     @property
     def admin_url(self):
         """Admin Endpoint URL"""
         return "{}:{}".format(canonical_url(ADMIN),
                               self.api_port(self.default_service,
                                             ADMIN))
+
     @property
     def internal_url(self):
         """Internal Endpoint URL"""
         return "{}:{}".format(canonical_url(INTERNAL),
                               self.api_port(self.default_service,
                                             INTERNAL))
+
 
 class OpenStackCharmFactory(object):
 
@@ -94,5 +105,3 @@ class OpenStackCharmFactory(object):
             return cls.releases[release]
         else:
             return cls.releases[cls.first_release]
-
-

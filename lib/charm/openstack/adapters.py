@@ -114,9 +114,6 @@ class DatabaseRelationAdapter(OpenStackRelationAdapter):
         return uri
 
 
-
-
-
 class ConfigurationAdapter(object):
     """
     Configuration Adapter which provides python based access
