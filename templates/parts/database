@@ -1,3 +1,3 @@
 {% if shared_db.host -%}
-sql_connection = {{ shared_db.type }}://{{ shared_db.username }}:{{ shared_db.password }}@{{ shared_db.host }}/{{ shared_db.database }}{% if database_ssl_ca %}?ssl_ca={{ database_ssl_ca }}{% if database_ssl_cert %}&ssl_cert={{ database_ssl_cert }}&ssl_key={{ database_ssl_key }}{% endif %}{% endif %}
+sql_connection = {{ shared_db.uri }}
 {% endif -%}
