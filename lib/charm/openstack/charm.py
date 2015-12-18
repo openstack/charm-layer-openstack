@@ -100,8 +100,11 @@ class OpenStackCharmFactory(object):
 
     @classmethod
     def charm(cls, release=None):
-        """Get the right charm for the configured OpenStack series"""
+        """
+        Get an instance of the right charm for the
+        configured OpenStack series
+        """
         if release and release in cls.releases:
-            return cls.releases[release]
+            return cls.releases[release]()
         else:
-            return cls.releases[cls.first_release]
+            return cls.releases[cls.first_release]()
