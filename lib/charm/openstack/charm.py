@@ -1,8 +1,10 @@
 """Classes to support writing re-usable charms in the reactive framework"""
 
+import os
 from charmhelpers.contrib.openstack.utils import (
     configure_installation_source,
 )
+from charmhelpers.core.host import path_hash, service_restart
 from charmhelpers.core.hookenv import config, status_set
 from charmhelpers.fetch import (
     apt_install,
@@ -11,6 +13,10 @@ from charmhelpers.fetch import (
 )
 
 from charm.openstack.ip import PUBLIC, INTERNAL, ADMIN, canonical_url
+from contextlib import contextmanager
+from collections import OrderedDict
+from charmhelpers.contrib.openstack.templating import get_loader
+from charmhelpers.core.templating import render
 
 
 class OpenStackCharm(object):
@@ -34,8 +40,12 @@ class OpenStackCharm(object):
     default_service = None
     """Default service for the charm"""
 
+    restart_map = {}
+
     def __init__(self):
         self.config = config()
+        # XXX It's not always liberty!
+        self.release = 'liberty'
 
     def install(self):
         """
@@ -83,6 +93,33 @@ class OpenStackCharm(object):
         return "{}:{}".format(canonical_url(INTERNAL),
                               self.api_port(self.default_service,
                                             INTERNAL))
+
+    @contextmanager
+    def restart_on_change(self):
+        checksums = {path: path_hash(path) for path in self.restart_map}
+        yield
+        restarts = []
+        for path in self.restart_map:
+            if path_hash(path) != checksums[path]:
+                restarts += self.restart_map[path]
+        services_list = list(OrderedDict.fromkeys(restarts))
+        for service_name in services_list:
+            service_restart(service_name)
+
+    def render_all_configs(self, adapters):
+        self.render_configs(adapters, self.restart_map.keys())
+
+    def render_configs(self, adapters, configs):
+        with self.restart_on_change():
+            for conf in self.restart_map.keys():
+                render(source=os.path.basename(conf),
+                       template_loader=get_loader('templates/', self.release),
+                       target=conf,
+                       context=adapters)
+
+    def restart_all(self):
+        for svc in self.restart_map.keys():
+            service_restart(svc)
 
 
 class OpenStackCharmFactory(object):
