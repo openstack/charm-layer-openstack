@@ -1,5 +1,6 @@
 """Classes to support writing re-usable charms in the reactive framework"""
 
+import subprocess
 import os
 from charmhelpers.contrib.openstack.utils import (
     configure_installation_source,
@@ -17,6 +18,7 @@ from contextlib import contextmanager
 from collections import OrderedDict
 from charmhelpers.contrib.openstack.templating import get_loader
 from charmhelpers.core.templating import render
+from charmhelpers.core.hookenv import leader_get, leader_set
 
 
 class OpenStackCharm(object):
@@ -41,11 +43,16 @@ class OpenStackCharm(object):
     """Default service for the charm"""
 
     restart_map = {}
+    sync_cmd = []
+    services = []
+    adapters_class = None
 
-    def __init__(self):
+    def __init__(self, interfaces=None):
         self.config = config()
         # XXX It's not always liberty!
         self.release = 'liberty'
+        if interfaces and self.adapters_class:
+            self.adapter_instance = self.adapters_class(interfaces)
 
     def install(self):
         """
@@ -106,20 +113,29 @@ class OpenStackCharm(object):
         for service_name in services_list:
             service_restart(service_name)
 
-    def render_all_configs(self, adapters):
-        self.render_configs(adapters, self.restart_map.keys())
+    def render_all_configs(self):
+        self.render_configs(self.adapters, self.restart_map.keys())
 
-    def render_configs(self, adapters, configs):
+    def render_configs(self, configs):
         with self.restart_on_change():
-            for conf in self.restart_map.keys():
+            for conf in configs:
                 render(source=os.path.basename(conf),
                        template_loader=get_loader('templates/', self.release),
                        target=conf,
-                       context=adapters)
+                       context=self.adapter_instance)
 
     def restart_all(self):
-        for svc in self.restart_map.keys():
+        for svc in self.services:
             service_restart(svc)
+
+    def db_sync(self):
+        sync_done = leader_get(attribute='db-sync-done')
+        if not sync_done:
+            subprocess.check_call(self.sync_cmd)
+            leader_set({'db-sync-done': True})
+            # Restart services immediatly after db sync as
+            # render_domain_config needs a working system
+            self.restart_all()
 
 
 class OpenStackCharmFactory(object):
@@ -136,12 +152,12 @@ class OpenStackCharmFactory(object):
     """
 
     @classmethod
-    def charm(cls, release=None):
+    def charm(cls, release=None, interfaces=None):
         """
         Get an instance of the right charm for the
         configured OpenStack series
         """
         if release and release in cls.releases:
-            return cls.releases[release]()
+            return cls.releases[release](interfaces=interfaces)
         else:
-            return cls.releases[cls.first_release]()
+            return cls.releases[cls.first_release](interfaces=interfaces)
