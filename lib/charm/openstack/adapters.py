@@ -78,7 +78,7 @@ class RabbitMQRelationAdapter(OpenStackRelationAdapter):
 
 class DatabaseRelationAdapter(OpenStackRelationAdapter):
     """
-    Adapter for the RabbitMQRequires relation interface.
+    Adapter for the Database relation interface.
     """
 
     interface_type = "database"
@@ -98,20 +98,33 @@ class DatabaseRelationAdapter(OpenStackRelationAdapter):
     def type(self):
         return 'mysql'
 
-    @property
-    def uri(self):
-        uri = 'mysql://{}:{}@{}/{}'.format(
-            self.username,
-            self.password,
-            self.host,
-            self.database,
-        )
+    def get_uri(self, prefix=None):
+        if prefix:
+            uri = 'mysql://{}:{}@{}/{}'.format(
+                self.relation.username(prefix=prefix),
+                self.relation.password(prefix=prefix),
+                self.host,
+                self.relation.database(prefix=prefix),
+            )
+        else:
+            uri = 'mysql://{}:{}@{}/{}'.format(
+                self.username,
+                self.password,
+                self.host,
+                self.database,
+            )
         if self.ssl_ca:
             uri = '{}?ssl_ca={}'.format(uri, self.ssl_ca)
             if self.ssl_cert:
                 uri = '{}&ssl_cert={}&ssl_key={}'.format(uri, self.ssl_cert,
                                                          self.ssl_key)
         return uri
+
+
+    @property
+    def uri(self):
+        return self.get_uri()
+
 
 
 class ConfigurationAdapter(object):
