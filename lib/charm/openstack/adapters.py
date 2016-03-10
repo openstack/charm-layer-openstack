@@ -120,11 +120,9 @@ class DatabaseRelationAdapter(OpenStackRelationAdapter):
                                                          self.ssl_key)
         return uri
 
-
     @property
     def uri(self):
         return self.get_uri()
-
 
 
 class ConfigurationAdapter(object):
