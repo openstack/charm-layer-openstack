@@ -20,12 +20,16 @@ from charmhelpers.contrib.openstack.templating import get_loader
 from charmhelpers.core.templating import render
 from charmhelpers.core.hookenv import leader_get, leader_set
 
+from charms.reactive.bus import set_state, remove_state
+
 
 class OpenStackCharm(object):
     """
     Base class for all OpenStack Charm classes;
     encapulates general OpenStack charm payload operations
     """
+
+    name = 'charmname'
 
     packages = []
     """Packages to install"""
@@ -63,6 +67,13 @@ class OpenStackCharm(object):
         if packages:
             status_set('maintenance', 'Installing packages')
             apt_install(packages, fatal=True)
+        self.set_state('{}-installed'.format(self.name))
+
+    def set_state(self, state, value=None):
+        set_state(state, value)
+
+    def remove_state(self, state):
+        remove_state(state)
 
     def api_port(self, service, endpoint_type=PUBLIC):
         """
