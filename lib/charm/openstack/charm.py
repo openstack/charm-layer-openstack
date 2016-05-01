@@ -125,7 +125,7 @@ class OpenStackCharm(object):
             service_restart(service_name)
 
     def render_all_configs(self):
-        self.render_configs(self.adapters, self.restart_map.keys())
+        self.render_configs(self.restart_map.keys())
 
     def render_configs(self, configs):
         with self.restart_on_change():
