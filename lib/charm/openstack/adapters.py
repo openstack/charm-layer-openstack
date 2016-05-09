@@ -15,10 +15,7 @@ class OpenStackRelationAdapter(object):
 
     def __init__(self, relation, accessors=None):
         self.relation = relation
-        if accessors:
-            self.accessors = accessors
-        else:
-            self.accessors = []
+        self.accessors = accessors or []
         self._setup_properties()
 
     @property
@@ -32,14 +29,17 @@ class OpenStackRelationAdapter(object):
         """
         Setup property based accessors for an interfaces
         auto accessors
+
+        Note that the accessor is dynamic as each access calls the underlying
+        getattr() for each property access.
         """
         self.accessors.extend(self.relation.auto_accessors)
         for field in self.accessors:
             meth_name = field.replace('-', '_')
-            # TODO: see if we can make this dynamic, rather
-            #       than making all calls on setup.
-            self.__dict__[meth_name] = getattr(self.relation,
-                                               meth_name)()
+            # Get the relation property dynamically
+            setattr(self.__class__,
+                    meth_name,
+                    property(lambda self: getattr(self.relation, meth_name)))
 
 
 class RabbitMQRelationAdapter(OpenStackRelationAdapter):
@@ -116,7 +116,8 @@ class DatabaseRelationAdapter(OpenStackRelationAdapter):
         if self.ssl_ca:
             uri = '{}?ssl_ca={}'.format(uri, self.ssl_ca)
             if self.ssl_cert:
-                uri = '{}&ssl_cert={}&ssl_key={}'.format(uri, self.ssl_cert,
+                uri = '{}&ssl_cert={}&ssl_key={}'.format(uri,
+                                                         self.ssl_cert,
                                                          self.ssl_key)
         return uri
 
@@ -135,7 +136,7 @@ class ConfigurationAdapter(object):
         _config = hookenv.config()
         for k, v in _config.items():
             k = k.replace('-', '_')
-            self.__dict__[k] = v
+            setattr(self, k, v)
 
 
 class OpenStackRelationAdapters(object):
@@ -172,16 +173,13 @@ class OpenStackRelationAdapters(object):
         self._relations = []
         for relation in relations:
             relation_name = relation.relation_name.replace('-', '_')
-            if relation_name in self._adapters:
-                self.__dict__[relation_name] = (
-                    self._adapters[relation_name](relation)
-                )
-            else:
-                self.__dict__[relation_name] = (
-                    OpenStackRelationAdapter(relation)
-                )
+            try:
+                relation_value = self._adapters[relation_name](relation)
+            except KeyError:
+                relation_value = OpenStackRelationAdapter(relation)
+            setattr(self, relation_name, relation_value)
             self._relations.append(relation_name)
-        self.__dict__['options'] = options()
+        self.options = options()
         self._relations.append('options')
 
     def __iter__(self):
@@ -189,4 +187,4 @@ class OpenStackRelationAdapters(object):
         Iterate over the relations presented to the charm.
         """
         for relation in self._relations:
-            yield relation, self.__dict__[relation]
+            yield relation, getattr(self, relation)

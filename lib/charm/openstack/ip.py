@@ -16,7 +16,7 @@ PUBLIC = 'public'
 INTERNAL = 'int'
 ADMIN = 'admin'
 
-_address_map = {
+_ADDRESS_MAP = {
     PUBLIC: {
         'config': 'os-public-network',
         'fallback': 'public-address'
@@ -47,28 +47,28 @@ def canonical_url(endpoint_type=PUBLIC):
     address = resolve_address(endpoint_type)
     if is_ipv6(address):
         address = "[{}]".format(address)
-    return '%s://%s' % (scheme, address)
+    return "{0}://{1}".format(scheme, address)
 
 
 def resolve_address(endpoint_type=PUBLIC):
     resolved_address = None
     if is_clustered():
-        if config(_address_map[endpoint_type]['config']) is None:
+        if config(_ADDRESS_MAP[endpoint_type]['config']) is None:
             # Assume vip is simple and pass back directly
             resolved_address = config('vip')
         else:
             for vip in config('vip').split():
                 if is_address_in_network(
-                        config(_address_map[endpoint_type]['config']),
+                        config(_ADDRESS_MAP[endpoint_type]['config']),
                         vip):
                     resolved_address = vip
     else:
         if config('prefer-ipv6'):
             fallback_addr = get_ipv6_addr(exc_list=[config('vip')])[0]
         else:
-            fallback_addr = unit_get(_address_map[endpoint_type]['fallback'])
+            fallback_addr = unit_get(_ADDRESS_MAP[endpoint_type]['fallback'])
         resolved_address = get_address_in_network(
-            config(_address_map[endpoint_type]['config']), fallback_addr)
+            config(_ADDRESS_MAP[endpoint_type]['config']), fallback_addr)
 
     if resolved_address is None:
         raise ValueError('Unable to resolve a suitable IP address'
