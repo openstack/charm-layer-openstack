@@ -1,7 +1,12 @@
 """Classes to support writing re-usable charms in the reactive framework"""
 
+from __future__ import absolute_import
+
 import subprocess
 import os
+from contextlib import contextmanager
+from collections import OrderedDict
+
 from charmhelpers.contrib.openstack.utils import (
     configure_installation_source,
 )
@@ -12,15 +17,12 @@ from charmhelpers.fetch import (
     apt_update,
     filter_installed_packages,
 )
-
-from charm.openstack.ip import PUBLIC, INTERNAL, ADMIN, canonical_url
-from contextlib import contextmanager
-from collections import OrderedDict
 from charmhelpers.contrib.openstack.templating import get_loader
 from charmhelpers.core.templating import render
 from charmhelpers.core.hookenv import leader_get, leader_set
-
 from charms.reactive.bus import set_state, remove_state
+
+from charm.openstack.ip import PUBLIC, INTERNAL, ADMIN, canonical_url
 
 
 class OpenStackCharm(object):
@@ -114,13 +116,13 @@ class OpenStackCharm(object):
 
     @contextmanager
     def restart_on_change(self):
-        checksums = {path: path_hash(path) for path in self.restart_map}
+        checksums = {path: path_hash(path) for path in self.restart_map.keys()}
         yield
         restarts = []
         for path in self.restart_map:
             if path_hash(path) != checksums[path]:
                 restarts += self.restart_map[path]
-        services_list = list(OrderedDict.fromkeys(restarts))
+        services_list = list(OrderedDict.fromkeys(restarts).keys())
         for service_name in services_list:
             service_restart(service_name)
 

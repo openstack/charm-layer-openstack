@@ -23,7 +23,7 @@ class OpenStackRelationAdapter(object):
         """
         Name of the relation this adapter is handling.
         """
-        return self._relation.relation_name
+        return self.relation.relation_name
 
     def _setup_properties(self):
         """
@@ -37,9 +37,15 @@ class OpenStackRelationAdapter(object):
         for field in self.accessors:
             meth_name = field.replace('-', '_')
             # Get the relation property dynamically
+            # Note the additional lambda name: is to create a closure over
+            # meth_name so that a new 'name' gets created for each loop,
+            # otherwise the same variable meth_name is referenced in each of
+            # the internal lambdas.  i.e. this is (lambda x: ...)(value)
             setattr(self.__class__,
                     meth_name,
-                    property(lambda self: getattr(self.relation, meth_name)))
+                    (lambda name: property(
+                        lambda self: getattr(
+                            self.relation, name)()))(meth_name))
 
 
 class RabbitMQRelationAdapter(OpenStackRelationAdapter):
@@ -113,12 +119,15 @@ class DatabaseRelationAdapter(OpenStackRelationAdapter):
                 self.host,
                 self.database,
             )
-        if self.ssl_ca:
-            uri = '{}?ssl_ca={}'.format(uri, self.ssl_ca)
-            if self.ssl_cert:
-                uri = '{}&ssl_cert={}&ssl_key={}'.format(uri,
-                                                         self.ssl_cert,
-                                                         self.ssl_key)
+        try:
+            if self.ssl_ca:
+                uri = '{}?ssl_ca={}'.format(uri, self.ssl_ca)
+                if self.ssl_cert:
+                    uri = ('{}&ssl_cert={}&ssl_key={}'
+                           .format(uri, self.ssl_cert, self.ssl_key))
+        except AttributeError:
+            # ignore ssl_ca or ssl_cert if not available
+            pass
         return uri
 
     @property
