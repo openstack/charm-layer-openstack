@@ -37,9 +37,15 @@ class OpenStackRelationAdapter(object):
         for field in self.accessors:
             meth_name = field.replace('-', '_')
             # Get the relation property dynamically
+            # Note the additional lambda name: is to create a closure over
+            # meth_name so that a new 'name' gets created for each loop,
+            # otherwise the same variable meth_name is referenced in each of
+            # the internal lambdas.  i.e. this is (lambda x: ...)(value)
             setattr(self.__class__,
                     meth_name,
-                    property(lambda self: getattr(self.relation, meth_name)))
+                    (lambda name: property(
+                        lambda self: getattr(
+                            self.relation, name)()))(meth_name))
 
 
 class RabbitMQRelationAdapter(OpenStackRelationAdapter):
