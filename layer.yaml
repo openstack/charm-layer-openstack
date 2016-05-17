@@ -1,7 +1,3 @@
 includes: ['layer:basic']
 ignore:
-  - 'unit_tests'
-  - 'Makefile'
-  - '.testr.conf'
-  - 'test-requirements.txt'
-  - 'tox.ini'
+  - 'README.md'
