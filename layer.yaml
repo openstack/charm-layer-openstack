@@ -1,3 +1,1 @@
 includes: ['layer:basic']
-ignore:
-  - 'README.md'
