@@ -1,7 +1,13 @@
+# Overview
+
+This layer provides the base OpenStack configuration options and dependencies
+for authoring OpenStack Charms.  Typically you won't use this layer directly
+the openstack-api or openstack-principle layers which consume this layer
+are probably more interesting as extension points.
+
 # Where is the code?
 
-The code for this module is now held in the charm.openstack module which is
-available at the following locations:
+The code for this module is held in the charms.openstack module which is
+developed at the following location:
 
- - TODO PyPi
- - TODO github.com/openstack-charms/charm.openstack
+ - https://github.com/openstack/charm.openstack
