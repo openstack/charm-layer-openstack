@@ -1,1 +1,2 @@
 includes: ['layer:basic']
+repo: 'https://github.com/openstack/charm-layer-openstack'
