@@ -12,4 +12,4 @@ directly use.
 The code for this module is held in the charms.openstack module which is
 developed at the following location:
 
- - https://github.com/openstack/charm.openstack
+ - https://github.com/openstack/charms.openstack
