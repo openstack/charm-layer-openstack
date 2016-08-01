@@ -1,9 +1,14 @@
-{% if auth_host -%}
+{% if identity_service.auth_host -%}
 [keystone_authtoken]
-identity_uri = {{ auth_protocol }}://{{ auth_host }}:{{ auth_port }}/{{ auth_admin_prefix }}
-auth_uri = {{ service_protocol }}://{{ service_host }}:{{ service_port }}/{{ service_admin_prefix }}
-admin_tenant_name = {{ admin_tenant_name }}
-admin_user = {{ admin_user }}
-admin_password = {{ admin_password }}
-signing_dir = {{ signing_dir }}
+auth_uri = {{ identity_service.service_protocol }}://{{ identity_service.service_host }}:{{ identity_service.service_port }}
+auth_url = {{ identity_service.auth_protocol }}://{{ identity_service.auth_host }}:{{ identity_service.auth_port }}
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+project_name = services
+username = {{ identity_service.service_username }}
+password = {{ identity_service.service_password }}
+{% if identity_service.signing_dir -%}
+signing_dir = {{ identity_service.signing_dir }}
+{% endif -%}
 {% endif -%}
