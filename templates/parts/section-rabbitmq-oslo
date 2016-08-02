@@ -16,7 +16,7 @@ rabbit_host = {{ amqp.host }}
 rabbit_use_ssl = True
 rabbit_port = {{ amqp.ssl_port }}
 {% if amqp.ssl_ca -%}
-kombu_ssl_ca_certs = {{ amqp.ssl_ca }}
+kombu_ssl_ca_certs = {{ amqp.ssl_ca_file }}
 {% endif -%}
 {% endif -%}
 {% endif -%}
