@@ -11,4 +11,7 @@ password = {{ identity_service.service_password }}
 {% if identity_service.signing_dir -%}
 signing_dir = {{ identity_service.signing_dir }}
 {% endif -%}
+{% if options.use_memcache == true -%}
+memcached_servers = {{ options.memcache_url }}
+{% endif -%}
 {% endif -%}
