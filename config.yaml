@@ -12,4 +12,10 @@ options:
     default: False
     description: |
       Setting this to True will allow supporting services to log to syslog.
-
+  use-internal-endpoints:
+    type: boolean
+    default: False
+    description: |
+      Openstack mostly defaults to using public endpoints for
+      internal communication between services. If set to True this option
+      will configure services to use internal endpoints where possible.
