@@ -1,4 +1,3 @@
-import charmhelpers.core.hookenv as hookenv
 import charmhelpers.core.unitdata as unitdata
 
 import charms_openstack.charm as charm
@@ -63,6 +62,5 @@ def default_update_status():
                'run-default-update-status')
 def run_default_update_status():
     with charm.provide_charm_instance() as instance:
-        hookenv.application_version_set(instance.application_version)
         instance.assess_status()
     reactive.remove_state('run-default-update-status')
