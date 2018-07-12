@@ -13,7 +13,7 @@ def default_install():
     The instance automagically becomes the derived OpenStackCharm instance.
     The kv() key charmers.openstack-release-version' is used to cache the
     release being used for this charm.  It is determined by the
-    default_select_release() function below, unless this is overriden by
+    default_select_release() function below, unless this is overridden by
     the charm author
     """
     unitdata.kv().unset(defaults.OPENSTACK_RELEASE_KEY)
