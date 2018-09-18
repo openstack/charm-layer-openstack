@@ -1,0 +1,89 @@
+#!/usr/bin/env python3
+# Copyright 2016 Canonical Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import os
+import sys
+
+# Load modules from $CHARM_DIR/lib
+sys.path.append('lib')
+
+from charms.layer import basic
+basic.bootstrap_charm_deps()
+basic.init_config_states()
+
+import charms.reactive as reactive
+import charmhelpers.core.hookenv as hookenv
+import charms_openstack.charm
+
+"""This module defines the generic OpenStack charm actions. To use these the
+charm needs to call run_action having imported the charms charm class e.g.
+
+```
+#!/usr/bin/env python3
+import sys
+import os_generic_actions
+
+import charm.openstack.aodh  # noqa
+
+sys.exit(os_generic_actions.run_action(sys.argv))
+```
+
+The above code can be placed in a file called *os_actions.py* symbolic links
+with the action names can then be created.
+
+```
+lrwxrwxrwx 1 root root   13 Sep 18 06:45 pause -> os_actions.py
+lrwxrwxrwx 1 root root   13 Sep 18 06:45 resume -> os_actions.py
+```
+
+"""
+
+def pause_action(*args):
+    """Run the pause action."""
+    with charms_openstack.charm.provide_charm_instance() as charm_instance:
+        charm_instance.pause()
+        # Run _assess_status rather than assess_status so the call is not
+        # deferred.
+        charm_instance._assess_status()
+
+
+def resume_action(*args):
+    """Run the resume action."""
+    with charms_openstack.charm.provide_charm_instance() as charm_instance:
+        charm_instance.resume()
+        # Run _assess_status rather than assess_status so the call is not
+        # deferred.
+        charm_instance._assess_status()
+
+
+# Actions to function mapping, to allow for illegal python action names that
+# can map to a python function.
+ACTIONS = {
+    "pause": pause_action,
+    "resume": resume_action,
+}
+
+
+def run_action(args):
+    action_name = os.path.basename(args[0])
+    try:
+        action = ACTIONS[action_name]
+    except KeyError:
+        return "Action %s undefined" % action_name
+    else:
+        try:
+            action(args)
+        except Exception as e:
+            hookenv.action_fail(str(e))
