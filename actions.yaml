@@ -9,5 +9,3 @@
     Resume services.
     If the deployment is clustered using the hacluster charm, the
     corresponding hacluster unit on the node must be resumed as well.
-"debug":
-  "description": "Collect debug data"
