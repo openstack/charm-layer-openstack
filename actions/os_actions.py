@@ -47,11 +47,18 @@ def resume_action(*args):
         charm_instance._assess_status()
 
 
+def restart_services(*args):
+    """Run the resume action."""
+    with charms_openstack.charm.provide_charm_instance() as charm_instance:
+        charm_instance.restart_services()
+
+
 # Actions to function mapping, to allow for illegal python action names that
 # can map to a python function.
 ACTIONS = {
     "pause": pause_action,
     "resume": resume_action,
+    "restart-services": restart_services,
 }
 
 
