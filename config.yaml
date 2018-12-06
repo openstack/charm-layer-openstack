@@ -19,3 +19,8 @@ options:
       Openstack mostly defaults to using public endpoints for
       internal communication between services. If set to True this option
       will configure services to use internal endpoints where possible.
+  ssl_ca:
+    type: string
+    default:
+    description: |
+      SSL CA to use to communicate with other OpenStack cloud components.
