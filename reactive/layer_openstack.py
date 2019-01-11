@@ -66,6 +66,13 @@ def run_default_update_status():
     reactive.remove_state('run-default-update-status')
 
 
+@reactive.when('storage-backend.connected',
+               'charms.openstack.do-default-storage-backend.connected')
+def run_storage_backend():
+    with charm.provide_charm_instance() as instance:
+        instance.send_storage_backend_data()
+
+
 # Series upgrade hooks are a special case and reacting to the hook directly
 # makes sense as we may not want other charm code to run
 @reactive.hook('pre-series-upgrade')
