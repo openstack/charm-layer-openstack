@@ -1,3 +1,8 @@
+# charmhelpers.contrib.openstack.cert_utils charms with certificates relation
+dnspython
+# charmhelpers.contrib.network all
 netifaces>=0.10.4
+# charmhelpers.contrib.openstack.context all
+psutil
 # charms_openstack - pull from github until first release
 git+https://github.com/openstack/charms.openstack.git#egg=charms.openstack
