@@ -1,2 +1,2 @@
-includes: ['layer:basic']
+includes: ['layer:basic', 'interface:tls-certificates']
 repo: 'https://github.com/openstack/charm-layer-openstack'
