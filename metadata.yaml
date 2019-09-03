@@ -6,3 +6,6 @@ description: |
 tags:
   - openstack
 series: []
+requires:
+  certificates:
+    interface: tls-certificates

@@ -1,8 +1,9 @@
+import charms.reactive as reactive
+
 import charmhelpers.core.unitdata as unitdata
 
 import charms_openstack.charm as charm
 import charms_openstack.charm.defaults as defaults
-import charms.reactive as reactive
 
 
 @reactive.when_not('charm.installed')
@@ -89,3 +90,36 @@ def default_post_series_upgrade():
     """
     with charm.provide_charm_instance() as instance:
         instance.series_upgrade_complete()
+
+
+@reactive.when('certificates.available',
+               'charms.openstack.do-default-certificates.available')
+def default_request_certificates():
+    """When the certificates interface is available, this default handler
+    requests TLS certificates.
+    """
+    tls = reactive.endpoint_from_flag('certificates.available')
+    with charm.provide_charm_instance() as instance:
+        for cn, req in instance.get_certificate_requests().items():
+            tls.add_request_server_cert(cn, req['sans'])
+        tls.request_server_certs()
+        instance.assess_status()
+
+
+@reactive.when('charms.openstack.do-default-certificates.available')
+@reactive.when_any(
+    'certificates.ca.changed',
+    'certificates.certs.changed')
+def default_configure_certificates():
+    """When the certificates interface is available, this default handler
+    updates on-disk certificates and switches on the TLS support.
+    """
+    tls = reactive.endpoint_from_flag('certificates.available')
+    with charm.provide_charm_instance() as instance:
+        instance.configure_tls(tls)
+        # make charms.openstack required relation check happy
+        reactive.set_flag('certificates.connected')
+        for flag in 'certificates.ca.changed', 'certificates.certs.changed':
+            if reactive.is_flag_set(flag):
+                reactive.clear_flag(flag)
+        instance.assess_status()

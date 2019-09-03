@@ -19,8 +19,27 @@ options:
       Openstack mostly defaults to using public endpoints for
       internal communication between services. If set to True this option
       will configure services to use internal endpoints where possible.
+  ssl_cert:
+    type: string
+    default:
+    description: |
+      TLS certificate to install and use for any listening services.
+      .
+      __NOTE__: This configuration option will take precedence over any
+                certificates received over the ``certificates`` relation.
+  ssl_key:
+    type: string
+    default:
+    description: |
+      TLS key to use with certificate specified as ``ssl_cert``.
+      .
+      __NOTE__: This configuration option will take precedence over any
+                certificates received over the ``certificates`` relation.
   ssl_ca:
     type: string
     default:
     description: |
-      SSL CA to use to communicate with other OpenStack cloud components.
+      TLS CA to use to communicate with other components in a deployment.
+      .
+      __NOTE__: This configuration option will take precedence over any
+                certificates received over the ``certificates`` relation.
