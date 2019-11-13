@@ -1,2 +1,4 @@
 includes: ['layer:basic', 'interface:tls-certificates']
+exclude: ['.gitignore', '.gitreview', '.zuul.yaml', 'README.md',
+          'requirements.txt', 'test-requirements.txt']
 repo: 'https://github.com/openstack/charm-layer-openstack'
