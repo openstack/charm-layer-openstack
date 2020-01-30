@@ -2,8 +2,12 @@ import charms.reactive as reactive
 
 import charmhelpers.core.unitdata as unitdata
 
+import charms_openstack.bus
 import charms_openstack.charm as charm
 import charms_openstack.charm.defaults as defaults
+
+
+charms_openstack.bus.discover()
 
 
 @reactive.when_not('charm.installed')
