@@ -130,7 +130,7 @@ def default_configure_certificates():
 
 
 @reactive.when('charms.openstack.do-default-config-rendered')
-@reactive.when_not('config.rendered')
+@reactive.when_not('charm.paused', 'config.rendered')
 def default_config_not_rendered():
     """Disable services until charm code has set the config.rendered state."""
     with charm.provide_charm_instance() as instance:
@@ -140,6 +140,7 @@ def default_config_not_rendered():
 
 @reactive.when('charms.openstack.do-default-config-rendered',
                'config.rendered')
+@reactive.when_not('charm.paused')
 def default_config_rendered():
     """Enable services when charm code has set the config.rendered state."""
     with charm.provide_charm_instance() as instance:
