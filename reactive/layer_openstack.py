@@ -1,5 +1,6 @@
 import charms.reactive as reactive
 
+import charmhelpers.core.hookenv as hookenv
 import charmhelpers.core.unitdata as unitdata
 
 import charms_openstack.bus
@@ -58,9 +59,30 @@ def run_default_upgrade_charm():
 @reactive.hook('update-status')
 def default_update_status():
     """Default handler for update-status state.
-    Just call update status.
+
+    Sets the state so that the default update-status handler can be called.
+    Sets the flag is-update-status-hook to indicate that the current hook is an
+    update-status hook; registers an atexit handler to clear the flag at the
+    end of the hook.
     """
-    reactive.set_state('run-default-update-status')
+    reactive.set_flag('run-default-update-status')
+    reactive.set_flag('is-update-status-hook')
+
+    def atexit_clear_update_status_flag():
+        reactive.clear_flag('is-update-status-hook')
+
+    hookenv.atexit(atexit_clear_update_status_flag)
+
+
+@reactive.when('is-update-status-hook')
+def check_really_is_update_status():
+    """Clear the is-update-status-hook if the hook is not assess-status.
+
+    This is in case the previous update-status hook execution died for some
+    reason and the flag never got cleared.
+    """
+    if hookenv.hook_name() != 'update-status':
+        reactive.clear_flag('is-update-status-hook')
 
 
 @reactive.when('charms.openstack.do-default-update-status',
