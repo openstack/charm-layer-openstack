@@ -2,6 +2,7 @@ import charms.reactive as reactive
 
 import charmhelpers.core.hookenv as hookenv
 import charmhelpers.core.unitdata as unitdata
+import charmhelpers.contrib.openstack.utils as os_utils
 
 import charms_openstack.bus
 import charms_openstack.charm as charm
@@ -26,6 +27,8 @@ def default_install():
     with charm.provide_charm_instance() as instance:
         instance.install()
     reactive.set_state('charm.installed')
+    if hookenv.is_subordinate():
+        reactive.set_state('charm.is-subordinate')
 
 
 @reactive.when('config.changed',
@@ -46,6 +49,8 @@ def default_upgrade_charm():
     This calls the charm.singleton.upgrade_charm() function as a default.
     """
     reactive.set_state('run-default-upgrade-charm')
+    if hookenv.is_subordinate():
+        reactive.set_state('charm.is-subordinate')
 
 
 @reactive.when('charms.openstack.do-default-upgrade-charm',
@@ -168,3 +173,28 @@ def default_config_rendered():
     with charm.provide_charm_instance() as instance:
         instance.enable_services()
         instance.assess_status()
+
+
+@reactive.when('charm.is-subordinate')
+def subordinate_maybe_publish_releases_packages_map():
+    """Publish rel-pkg map on opt-in container relations if subordinate."""
+    for endpoint_name in os_utils.container_scoped_relations():
+        if (not reactive.is_flag_set('{}.connected'.format(endpoint_name)) or
+                hookenv.hook_name() not in (
+                    'upgrade-charm',
+                    '{}-relation-joined'.format(endpoint_name),
+                    '{}-relation-changed'.format(endpoint_name))):
+            # Avoid calling into endpoint code before relation actually joined
+            continue
+        # Publish/Update our release package map if we are a subordinate
+        # charm with endpoints that have implemented the feature
+        ep = reactive.endpoint_from_name(endpoint_name)
+        try:
+            with charm.provide_charm_instance() as instance:
+                ep.publish_releases_packages_map(
+                    instance.releases_packages_map)
+        except AttributeError:
+            # Either the charm does not contiain interface code for the
+            # endpoint or the interface implementation has not opted into
+            # the requested functionality.
+            pass
