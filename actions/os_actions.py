@@ -23,6 +23,7 @@ from charms.layer import basic
 basic.bootstrap_charm_deps()
 
 import charmhelpers.core.hookenv as hookenv
+import charmhelpers.core as ch_core
 import charms_openstack.bus
 import charms_openstack.charm
 
@@ -63,6 +64,9 @@ ACTIONS = {
 
 
 def main(args):
+    # Manually trigger any register atstart events to ensure all endpoints
+    # are correctly setup, Bug #1916008.
+    ch_core.hookenv._run_atstart()
     action_name = os.path.basename(args[0])
     try:
         action = ACTIONS[action_name]
@@ -73,6 +77,7 @@ def main(args):
             action(args)
         except Exception as e:
             hookenv.action_fail(str(e))
+    ch_core.hookenv._run_atexit()
 
 
 if __name__ == "__main__":
