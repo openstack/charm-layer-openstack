@@ -125,6 +125,7 @@ def default_post_series_upgrade():
 
 @reactive.when('certificates.available',
                'charms.openstack.do-default-certificates.available')
+@reactive.when_not('is-update-status-hook')
 def default_request_certificates():
     """When the certificates interface is available, this default handler
     requests TLS certificates.
@@ -141,6 +142,7 @@ def default_request_certificates():
 @reactive.when_any(
     'certificates.ca.changed',
     'certificates.certs.changed')
+@reactive.when_not('is-update-status-hook')
 def default_configure_certificates():
     """When the certificates interface is available, this default handler
     updates on-disk certificates and switches on the TLS support.
