@@ -13,6 +13,9 @@ user_domain_name = default
 project_name = {{ identity_service.service_tenant }}
 username = {{ identity_service.service_username }}
 password = {{ identity_service.service_password }}
+{% if identity_service.service_type -%} 
+service_type = {{ identity_service.service_type }}
+{% endif -%}
 {% if identity_service.signing_dir -%}
 signing_dir = {{ identity_service.signing_dir }}
 {% endif -%}
