@@ -12,5 +12,3 @@ netifaces>=0.10.4
 psutil
 # charms_openstack - pull from github until first release
 git+https://github.com/openstack/charms.openstack.git#egg=charms.openstack
-# Pin Tempita fix build time error "setup command: use_2to3 is invalid"
-Tempita<0.5
