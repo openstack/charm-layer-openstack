@@ -1,11 +1,5 @@
 # charmhelpers.contrib.openstack.cert_utils charms with certificates relation
-
-# NOTE(lourot): dnspython 2.0.0 dropped py3.5 support. We can't use environment
-# markers like "python_version < '3.6'" here because they get matched at build
-# time against the interpreter used to build the charm, not against the target
-# interpreter at install time.
-dnspython<2.0.0
-
+dnspython
 # charmhelpers.contrib.network all
 netifaces>=0.10.4
 # charmhelpers.contrib.openstack.context all
