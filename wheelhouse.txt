@@ -1,6 +1,8 @@
 # charmhelpers.contrib.openstack.cert_utils charms with certificates relation
-poetry-core  # needed to build dnspython.
-dnspython
+# hatchling, and thus calver, is required for dnspython>=2.5.0
+calver
+hatchling
+dnspython>=2.5.0
 # charmhelpers.contrib.network all
 netifaces>=0.10.4
 # charmhelpers.contrib.openstack.context all
