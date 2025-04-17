@@ -18,6 +18,9 @@ import sys
 
 # Load modules from $CHARM_DIR/lib
 sys.path.append('lib')
+# Some charms include extra functionality in the hooks/ directory
+# Load modules from $CHARM_DIR/hooks (eg hooks/relations)
+sys.path.append('hooks')
 
 from charms.layer import basic
 basic.bootstrap_charm_deps()
