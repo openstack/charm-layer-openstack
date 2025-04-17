@@ -9,3 +9,4 @@ netifaces>=0.10.4
 psutil
 # charms_openstack - pull from github until first release
 git+https://github.com/openstack/charms.openstack.git#egg=charms.openstack
+pbr>=6.1.1

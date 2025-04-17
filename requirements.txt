@@ -1,4 +1,4 @@
 # Requirements to build the layer
-charm-tools
+git+https://github.com/juju/charm-tools.git
 simplejson
 flake8
